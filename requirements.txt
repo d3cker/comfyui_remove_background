@@ -1,0 +1,4 @@
+onnxruntime>=1.23.2
+onnxruntime-gpu>=1.23.2
+rembg>=2.0.69
+pillow>=12.0.0
