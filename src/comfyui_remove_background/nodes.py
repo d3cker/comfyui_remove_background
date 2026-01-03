@@ -153,7 +153,7 @@ class RemoveBackground:
         image,
         model="birefnet-portrait",
         device="auto",
-        allow_cpu_fallback=True,
+        allow_cpu_fallback=False,
         preload_dlls=False,
         alpha_matting=False,
         alpha_matting_foreground_threshold=240,

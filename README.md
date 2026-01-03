@@ -1,67 +1,63 @@
 # ComfyUI Background Removal
 
-Custom ComfyUI node for background removal in images. Built with ONNX models and Pillow (PIL).
+![Example workflow](img/confy_remove_bg.jpg)
 
-> [!NOTE]
-> This projected was created with a [cookiecutter](https://github.com/Comfy-Org/cookiecutter-comfy-extension) template. It helps you start writing custom nodes without worrying about the Python setup.
+Custom ComfyUI node for background removal in images. Built on top of **rembg** (with ONNX models) and Pillow (PIL) 
+It takes an image as input and produces an image (IMAGE) and an alpha mask (MASK) as output.
 
 ## Quickstart
 
 1. Install [ComfyUI](https://docs.comfy.org/get_started).
-1. Install [ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager)
-1. Look up this extension in ComfyUI-Manager. If you are installing manually, clone this repository under `ComfyUI/custom_nodes`.
-1. Restart ComfyUI.
+2. Activate ComfyUI virual environment. For example:
+``
+source venv/bin/activate
+``
+3. Install node in `custom_nodes` folder:
+```
+cd ComfyUI/custom_nodes
+git clone https://github.com/d3cker/comfyui_remove_background
+```
+4. Install requirements
+```
+cd comfyui_remove_background
+pip3 install -r requirements.txt
+```
 
 # Features
 
-- A list of features
+- For all features please read [rembg](https://github.com/danielgatis/rembg) documentation. 
+- Muli-GPU / CPU support
+- Preload dlls for Windows
+- Alpha matting (CPU)
 
-## Develop
+# Options
 
-To install the dev dependencies and pre-commit (will run the ruff hook), do:
+- model: Choose prefered model.
+- device: auto/cpu/cuda:1/cuda:2, etc.
+- allow_cpu_fallback: Fallback to CPU if GPU not available.
+- alpha_matting: Enables alpha matting to refine the alpha channel and improve edge separation (e.g., hair, fur, semi-transparent edges).
+- alpha_matting_background_threshold: Mask value at or below this is treated as sure background when building the trimap (lower = less aggressive background)
+- alpha_matting_foreground_threshold: Mask value at or above this is treated as sure foreground when building the trimap (higher = stricter foreground).
+- alpha_matting_erode_size: Erosion size used to shrink sure foreground/background regions, increasing the “unknown” band for matting (larger = wider refinement zone, slower/more smoothing).
 
-```bash
-cd comfyui_remove_background
-pip install -e .[dev]
-pre-commit install
+# Supported models
+
+List from **rembg** repository:
+
 ```
-
-The `-e` flag above will result in a "live" install, in the sense that any changes you make to your node extension will automatically be picked up the next time you run ComfyUI.
-
-## Publish to Github
-
-Install Github Desktop or follow these [instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) for ssh.
-
-1. Create a Github repository that matches the directory name. 
-2. Push the files to Git
+- u2net - A pre-trained model for general use cases.
+- u2netp - A lightweight version of u2net model.
+- u2net_human_seg : A pre-trained model for human segmentation.
+- u2net_cloth_seg - A pre-trained model for Cloths Parsing from human portrait. Here clothes are parsed into 3 category: Upper body, Lower body and Full body.
+- silueta - Same as u2net but the size is reduced to 43Mb.
+- isnet-general-use - A new pre-trained model for general use cases.
+- isnet-anime - A high-accuracy segmentation for anime character.
+- sam - A pre-trained model for any use cases.
+- birefnet-general - A pre-trained model for general use cases.
+- birefnet-general-lite - A light pre-trained model for general use cases.
+- birefnet-portrait - A pre-trained model for human portraits.
+- birefnet-dis - A pre-trained model for dichotomous image segmentation (DIS).
+- birefnet-hrsod - A pre-trained model for high-resolution salient object detection (HRSOD).
+- birefnet-cod - A pre-trained model for concealed object detection (COD).
+- birefnet-massive - A pre-trained model with massive dataset.
 ```
-git add .
-git commit -m "project scaffolding"
-git push
-``` 
-
-## Writing custom nodes
-
-An example custom node is located in [node.py](src/comfyui_remove_background/nodes.py). To learn more, read the [docs](https://docs.comfy.org/essentials/custom_node_overview).
-
-
-## Tests
-
-This repo contains unit tests written in Pytest in the `tests/` directory. It is recommended to unit test your custom node.
-
-- [build-pipeline.yml](.github/workflows/build-pipeline.yml) will run pytest and linter on any open PRs
-- [validate.yml](.github/workflows/validate.yml) will run [node-diff](https://github.com/Comfy-Org/node-diff) to check for breaking changes
-
-## Publishing to Registry
-
-If you wish to share this custom node with others in the community, you can publish it to the registry. We've already auto-populated some fields in `pyproject.toml` under `tool.comfy`, but please double-check that they are correct.
-
-You need to make an account on https://registry.comfy.org and create an API key token.
-
-- [ ] Go to the [registry](https://registry.comfy.org). Login and create a publisher id (everything after the `@` sign on your registry profile). 
-- [ ] Add the publisher id into the pyproject.toml file.
-- [ ] Create an api key on the Registry for publishing from Github. [Instructions](https://docs.comfy.org/registry/publishing#create-an-api-key-for-publishing).
-- [ ] Add it to your Github Repository Secrets as `REGISTRY_ACCESS_TOKEN`.
-
-A Github action will run on every git push. You can also run the Github action manually. Full instructions [here](https://docs.comfy.org/registry/publishing). Join our [discord](https://discord.com/invite/comfyorg) if you have any questions!
-
